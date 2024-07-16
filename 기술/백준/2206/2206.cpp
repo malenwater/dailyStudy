@@ -1,116 +1,55 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <string>
-#include <cmath>
 using namespace std;
-int main(){
-    int N,M;
-    string tem1;
-    cin >> N >> M;
-    vector<vector<int>> adj(N + 1,vector<int>(M + 1));
-    vector<vector<int>> dist(N + 1,vector<int>(M + 1,-1));
-    queue<vector<int>> q;
-    for(int i =1; i <= N ;i++){
-        cin >> tem1;
-        for(int j = 1; j <= M;j++){
-            adj[i][j] = tem1[j - 1] - '0';
-        }
-    }
+int dx[4] = {-1,1,0,0};
+int dy[4] = {0,0,-1,1};
+int maze[1000][1000][2];
 
-    dist[1][1] = 0;
-    q.push({1,1});
-
-    while(q.size() != 0){
-        vector<int> cur = q.front();
+int BFS(int N, int M){
+    queue<pair<int, pair <int , int>>> q;
+    q.push({0,{0,0}});
+    while(!q.empty()){
+        int broken = q.front().first;
+        int x = q.front().second.first;
+        int y = q.front().second.second;
         q.pop();
-        // cout << cur[0] << " " << cur[1] << endl;
-        if(cur[0] - 1 >= 1 && dist[cur[0] - 1][cur[1]] == -1 && adj[cur[0] - 1][cur[1]] != 1){
-            dist[cur[0] - 1][cur[1]] = dist[cur[0]][cur[1]] + 1;
-            q.push({cur[0] - 1 ,cur[1]});
-        }
-        if(cur[0] + 1 <= N && dist[cur[0] + 1][cur[1]] == -1 && adj[cur[0] + 1][cur[1]] != 1){
-            dist[cur[0] + 1][cur[1]] = dist[cur[0]][cur[1]] + 1;
-            q.push({cur[0] + 1 ,cur[1]});
-        }
-        if(cur[1] - 1 >= 1 && dist[cur[0]][cur[1] - 1] == -1 && adj[cur[0]][cur[1] - 1] != 1){
-            dist[cur[0]][cur[1] - 1] = dist[cur[0]][cur[1]] + 1;
-            q.push({cur[0] , cur[1] - 1});         
-        }
-        if(cur[1] + 1 <= M && dist[cur[0]][cur[1] + 1] == -1 && adj[cur[0]][cur[1] + 1] != 1){
-            dist[cur[0]][cur[1] + 1] = dist[cur[0]][cur[1]] + 1;
-            q.push({cur[0], cur[1] + 1});
-        }
-    }
-
-    // for(int i =1; i < N + 1;i++){
-    //     for(int j = 1; j < M + 1;j++){
-    //         cout << dist[i][j];
-    //     }
-    //     cout << endl;
-    // }
-
-    vector<int> MAX_INDEX;
-    int max = -1;
-    for(int i =1; i <= N ;i++){
-        for(int j = 1; j <= M;j++){
-            if(adj[i][j] == 1){
-                if(abs(dist[i - 1][j] - dist[i + 1][j]) > max && adj[i - 1][j] != 1 && adj[i + 1][j] != 1 && i -1 >= 1 && i + 1 <= M){
-                    MAX_INDEX = {i,j};
-                    max = abs(dist[i - 1][j] - dist[i + 1][j]);
+        if(x == N -1 && y == M -1)
+            return maze[N-1][M-1][broken] + 1;
+        for(int i = 0; i < 4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if(nx < 0 || nx >= N || ny <0 || ny >= M)
+                continue;
+            if(maze[nx][ny][0] == 1){
+                if(!broken){
+                    maze[nx][ny][broken + 1] = maze[x][y][broken] + 1;
+                    q.push({1,{nx,ny}});
                 }
-                // if(abs(dist[i + 1][j] - dist[i - 1][j]) > max && adj[i + 1][j] != 1 && adj[i - 1][j] != 1 && i -1 >= 1 && i + 1 <= M){
-                //     MAX_INDEX = {i,j};
-                // }
-                if(abs(dist[i][j - 1] - dist[i][j + 1]) > max && adj[i][j - 1] != 1 && adj[i][j + 1] != 1 && j -1 >= 1 && j + 1 <= N){
-                    MAX_INDEX = {i,j};
-                    max = abs(dist[i - 1][j] - dist[i + 1][j]);
-                }
-                // if(abs(dist[i][j + 1] - dist[i][j - 1]) > max && adj[i][j + 1] != 1 && adj[i][j - 1] != 1 && j -1 >= 1 && j + 1 <= N){
-                //     MAX_INDEX = {i,j};
-                // }
+            }
+            else if (maze[nx][ny][0] == 0){
+                if (broken == 1 && maze[nx][ny][broken])
+                    continue;
+                maze[nx][ny][broken] = maze[x][y][broken] + 1;
+                q.push({broken, {nx,ny}});
             }
         }
     }
-    if(max != -1){
-        adj[MAX_INDEX[0]][MAX_INDEX[1]] = 0;
-        for(int i = 0; i <= N; ++i) {
-            fill(dist[i].begin(), dist[i].end(), -1);
-        }
-        dist[1][1] = 1;
-        q.push({1,1});
-
-        while(q.size() != 0){
-            vector<int> cur = q.front();
-            q.pop();
-            // cout << cur[0] << " " << cur[1] << endl;
-            if(cur[0] - 1 >= 1 && dist[cur[0] - 1][cur[1]] == -1 && adj[cur[0] - 1][cur[1]] != 1){
-                dist[cur[0] - 1][cur[1]] = dist[cur[0]][cur[1]] + 1;
-                q.push({cur[0] - 1 ,cur[1]});
-            }
-            if(cur[0] + 1 <= N && dist[cur[0] + 1][cur[1]] == -1 && adj[cur[0] + 1][cur[1]] != 1){
-                dist[cur[0] + 1][cur[1]] = dist[cur[0]][cur[1]] + 1;
-                q.push({cur[0] + 1 ,cur[1]});
-            }
-            if(cur[1] - 1 >= 1 && dist[cur[0]][cur[1] - 1] == -1 && adj[cur[0]][cur[1] - 1] != 1){
-                dist[cur[0]][cur[1] - 1] = dist[cur[0]][cur[1]] + 1;
-                q.push({cur[0] , cur[1] - 1});         
-            }
-            if(cur[1] + 1 <= M && dist[cur[0]][cur[1] + 1] == -1 && adj[cur[0]][cur[1] + 1] != 1){
-                dist[cur[0]][cur[1] + 1] = dist[cur[0]][cur[1]] + 1;
-                q.push({cur[0], cur[1] + 1});
-            }
+    return -1;
+}
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int N,M;
+    cin >> N >> M;
+    for(int i =0; i < N;i++){
+        for(int j = 0;j < M;j++){
+            char tmp;
+            cin >> tmp;
+            maze[i][j][0] = tmp - '0';
         }
     }
-
-    cout << dist[N][M] << endl;
-
-    // cout << max << endl;
-    // for(int i =1; i < N + 1;i++){
-    //     for(int j = 1; j < M + 1;j++){
-    //         cout << dist[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    cout << BFS(N, M);
     return 0;
 }
