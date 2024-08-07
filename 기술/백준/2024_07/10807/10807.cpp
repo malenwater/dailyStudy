@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 int N[100];
 int N_INDEX, Tem, V, Count = 0;
