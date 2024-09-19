@@ -1,62 +1,56 @@
 #include <iostream>
 #include <stack>
 using namespace std;
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    int N,tmp,N2,data,number,data_pick;
-    stack<int> arr_forward, arr_reverse;
+
+    int N,arr[1000000][2], tmp,size; // arr[1000000][2],
+    stack<pair<int,int>> Stack;
+    pair<int,int> p,p_before;
     cin >> N;
     for(int i = 0; i < N;i++){
-        cin >> tmp;
-        arr_forward.push(tmp);
-    }
-    for(int i = 0; i < N;i++){
-        tmp = arr_forward.top();
-        arr_forward.pop();
-        arr_reverse.push(tmp);
+        cin >> arr[i][0];
     }
 
     for(int i = 0; i < N;i++){
-        data = arr_reverse.top();
-        arr_reverse.pop();
-        number = 0;
-        data_pick = -1;
-
-        for(int j = 0; j < N - i - 1;j++){
-            tmp = arr_reverse.top();
-            arr_reverse.pop();
-            arr_forward.push(tmp);
-            number++;
-            if(data < tmp){
-                data_pick = tmp;
-                break;
+        tmp = arr[i][0];
+        p = make_pair(i,tmp);
+        if(Stack.empty()){
+            Stack.push(p);
+        }
+        else{
+            p_before = Stack.top();
+            if(p.second > p_before.second){
+                size = Stack.size();
+                for(int j = 0;j < size;j++){
+                    p_before = Stack.top();
+                    if(p.second <= p_before.second){
+                        break;
+                    }
+                    arr[p_before.first][1] = p.second;
+                    Stack.pop();
+                }
             }
+            Stack.push(p);
         }
-
-        for(int j = 0; j < number; j++){
-            tmp = arr_forward.top();
-            arr_forward.pop();
-            arr_reverse.push(tmp);
-        }
-        arr_forward.push(data_pick);
     }
 
-    for(int i = 0; i < N;i++){
-        tmp = arr_forward.top();
-        arr_forward.pop();
-        arr_reverse.push(tmp);
+    size = Stack.size();
+    for(int i = 0;i < size; i++){
+        p_before = Stack.top();
+        arr[p_before.first][1] = -1;
+        Stack.pop();
     }
 
-    for(int i = 0; i < N;i++){
-        tmp = arr_reverse.top();
-        arr_reverse.pop();
-        if(i == N-1){
-            cout << tmp;
+    for(int i =0; i < N;i++){
+        if(i != N-1){
+            cout << arr[i][1] << " ";
         }else{
-            cout << tmp << " ";
+            cout << arr[i][1] << "\n";
         }
     }
-    cout << "\n";
+
     return 0;
 }
