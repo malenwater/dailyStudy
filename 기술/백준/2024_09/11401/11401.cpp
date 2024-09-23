@@ -30,13 +30,6 @@ int main(){
     long long N,K;
     cin >> N >> K;
     factor(N);
-    // cout << v.at(N) << endl;
-    // cout << v[N ]<< endl;
-    // cout << v.at(N - K) << endl;
-    // cout << v.at(K) << endl;
-    // cout << (v.at(N) / (v.at(N - K) * v.at(K) % 1000000007) % 1000000007) << "\n";
-    // cout << mod_reverse(v.at(N - K)) << endl;
-    // cout << mod_reverse(v.at(K)) << endl;
     long long result = (v[N] * mod_reverse(v[K]) % MOD * mod_reverse(v[N - K]) % MOD) % MOD;
     cout << result << "\n";
     return 0;
